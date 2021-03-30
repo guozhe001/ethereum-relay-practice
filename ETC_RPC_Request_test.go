@@ -109,3 +109,10 @@ func TestHexUtil(t *testing.T) {
 func TestResultLength(t *testing.T) {
 	log.Printf("len(0x000000000000000000000000000000000000000043dacaf91c1a84ff08000000)=%d\n", len("0x000000000000000000000000000000000000000043dacaf91c1a84ff08000000"))
 }
+
+func TestGetBlockNumber(t *testing.T) {
+	request := NewETCRPCRequest(constant.MyRopstenNetNodeUrl)
+	number, err := request.GetBlockNumber()
+	assert.NoError(t, err)
+	log.Printf("current block number is 十六进制：%#v 十进制：%s \n", number, number.String())
+}

@@ -8,6 +8,7 @@ import (
 	"github.com/guozhe001/ethereum-relay-practice/model"
 	"github.com/guozhe001/ethereum-relay-practice/util"
 	"log"
+	"math/big"
 )
 
 type ETHRPCRequest struct {
@@ -98,4 +99,15 @@ func (e *ETHRPCRequest) GetERC20Balances(params []model.ERC20BalanceRequest) ([]
 		}
 	}
 	return result, nil
+}
+
+// GetBlockNumber 获取当前网络的最新的高度
+func (e *ETHRPCRequest) GetBlockNumber() (big.Int, error) {
+	blockNumber := ""
+	err := e.client.client.Call(&blockNumber, constant.MethodBlockNumber)
+	if err != nil {
+		return big.Int{}, err
+	}
+	setString, _ := new(big.Int).SetString(blockNumber[2:], 16)
+	return *setString, err
 }
