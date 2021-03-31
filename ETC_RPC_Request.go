@@ -103,11 +103,29 @@ func (e *ETHRPCRequest) GetERC20Balances(params []model.ERC20BalanceRequest) ([]
 
 // GetBlockNumber 获取当前网络的最新的高度
 func (e *ETHRPCRequest) GetBlockNumber() (big.Int, error) {
-	blockNumber := ""
-	err := e.client.client.Call(&blockNumber, constant.MethodBlockNumber)
+	blockNumber, err := e.GetBlockNumberHex()
 	if err != nil {
 		return big.Int{}, err
 	}
 	setString, _ := new(big.Int).SetString(blockNumber[2:], 16)
 	return *setString, err
+}
+
+// GetBlockNumber 获取当前网络的最新的高度
+func (e *ETHRPCRequest) GetBlockNumberHex() (string, error) {
+	blockNumber := ""
+	err := e.client.client.Call(&blockNumber, constant.MethodBlockNumber)
+	return blockNumber, err
+}
+
+// GetBlockByNumber 根据区块高度获取区块信息
+func (e *ETHRPCRequest) GetBlockByNumber(blockNumber big.Int, haveTransaction bool) (model.Block, error) {
+	return e.GetBlockByHexNumber(util.BigIntToHex(blockNumber), haveTransaction)
+}
+
+// GetBlockByNumber 根据区块高度获取区块信息
+func (e *ETHRPCRequest) GetBlockByHexNumber(blockHexNumber string, haveTransaction bool) (model.Block, error) {
+	block := model.Block{}
+	err := e.client.client.Call(&block, constant.MethodGetBlockByNumber, blockHexNumber, haveTransaction)
+	return block, err
 }

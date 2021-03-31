@@ -21,3 +21,13 @@ func GetZero(number int) (string, error) {
 	}
 	return constant.ZeroOf64[:number], nil
 }
+
+// HexToBigInt 把带"0x"前缀的十六进制的字符串转换成十进制的big.Int
+func HexToBigInt(hex string) (*big.Int, bool) {
+	return new(big.Int).SetString(hex[2:], 16)
+}
+
+// BigIntToHex 把big.Int转换成十六进制的字符串
+func BigIntToHex(num big.Int) string {
+	return ""
+}

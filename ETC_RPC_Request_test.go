@@ -1,14 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/guozhe001/ethereum-relay-practice/constant"
 	"github.com/guozhe001/ethereum-relay-practice/model"
+	"github.com/guozhe001/ethereum-relay-practice/util"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"math"
-	"math/big"
 	"strings"
 	"testing"
 )
@@ -82,7 +83,7 @@ func invokeGetERC20Balance(t *testing.T, request *ETHRPCRequest, requests []mode
 	}
 	for _, r := range responses {
 		// 必须使用big.Int接收，因为solidity中有uint256，但是go语言最大只能表示uint64
-		balance, b := new(big.Int).SetString((*r.Balance)[2:], 16)
+		balance, b := util.HexToBigInt(*r.Balance)
 		assert.True(t, b)
 		log.Printf("ERC20Token-contractAddress=%s, userAddress=%s, balance=%d \n", r.ContractAddress, r.UserAddress, balance)
 	}
@@ -97,7 +98,6 @@ func TestNumber(t *testing.T) {
 	// 这样除是不行的，因为如果除数小于被除数的时候得到的永远是0，这里要特别注意
 	i := 21000000000000000000000000000 / math.Pow(10, 21)
 	log.Println(i)
-
 }
 
 func TestHexUtil(t *testing.T) {
@@ -115,4 +115,24 @@ func TestGetBlockNumber(t *testing.T) {
 	number, err := request.GetBlockNumber()
 	assert.NoError(t, err)
 	log.Printf("current block number is 十六进制：%#v 十进制：%s \n", number, number.String())
+}
+
+func TestGetBlockByNumber(t *testing.T) {
+	invokeGetBlockByNumber(t, true)
+}
+
+func TestGetBlockByNumberFalse(t *testing.T) {
+	invokeGetBlockByNumber(t, false)
+}
+
+func invokeGetBlockByNumber(t *testing.T, haveTransaction bool) {
+	request := NewETCRPCRequest(constant.MyRopstenNetNodeUrl)
+	hexNumber, err := request.GetBlockNumberHex()
+	assert.NoError(t, err)
+	block, err := request.GetBlockByHexNumber(hexNumber, haveTransaction)
+	assert.NoError(t, err)
+	log.Printf("block=%#v", block)
+	jsonString, err := json.Marshal(block)
+	assert.NoError(t, err)
+	log.Printf("block json=%s", jsonString)
 }

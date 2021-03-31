@@ -28,3 +28,6 @@
 * eth_call中data参数的格式？
 * gas费如何赋值？
 * JSON RPC API的所有方法过一遍
+
+年化收益和年化标准差
+
