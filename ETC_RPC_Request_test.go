@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"log"
 	"math"
+	"math/big"
 	"strings"
 	"testing"
 )
@@ -125,7 +126,15 @@ func TestGetBlockByNumberFalse(t *testing.T) {
 	invokeGetBlockByNumber(t, false)
 }
 
-func invokeGetBlockByNumber(t *testing.T, haveTransaction bool) {
+func TestETHRPCRequest_GetBlockByHash(t *testing.T) {
+	request := NewETCRPCRequest(constant.MyRopstenNetNodeUrl)
+	block := invokeGetBlockByNumber(t, false)
+	blockByHash, err := request.GetBlockByHash(block.Hash, false)
+	assert.NoError(t, err)
+	assert.Equal(t, block.Number, blockByHash.Number)
+}
+
+func invokeGetBlockByNumber(t *testing.T, haveTransaction bool) model.Block {
 	request := NewETCRPCRequest(constant.MyRopstenNetNodeUrl)
 	hexNumber, err := request.GetBlockNumberHex()
 	assert.NoError(t, err)
@@ -135,4 +144,13 @@ func invokeGetBlockByNumber(t *testing.T, haveTransaction bool) {
 	jsonString, err := json.Marshal(block)
 	assert.NoError(t, err)
 	log.Printf("block json=%s", jsonString)
+	return block
+}
+
+func TestETHRPCRequest_InvokeERC20Transfer(t *testing.T) {
+	request := NewETCRPCRequest(constant.MyRopstenNetNodeUrl)
+	setString, b := new(big.Int).SetString("1", 10)
+	assert.True(t, b)
+	err := request.InvokeERC20Transfer("hello", *setString)
+	assert.NoError(t, err)
 }

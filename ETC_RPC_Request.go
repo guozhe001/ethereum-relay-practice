@@ -129,3 +129,24 @@ func (e *ETHRPCRequest) GetBlockByHexNumber(blockHexNumber string, haveTransacti
 	err := e.client.client.Call(&block, constant.MethodGetBlockByNumber, blockHexNumber, haveTransaction)
 	return block, err
 }
+
+// GetBlockByHash 根据区块hash获取区块信息
+func (e *ETHRPCRequest) GetBlockByHash(hash string, haveTransaction bool) (model.Block, error) {
+	block := model.Block{}
+	err := e.client.client.Call(&block, constant.MethodBlockByHash, hash, haveTransaction)
+	return block, err
+}
+
+// InvokeERC20Transfer 调用ERC20的transfer方法
+func (e *ETHRPCRequest) InvokeERC20Transfer(to string, value big.Int) error {
+	var success bool
+	methodId, err := util.GetMethodId("./abi/GZToken_metadata.json", "transfer")
+	if err != nil {
+		return err
+	}
+	err = e.client.client.Call(&success, constant.MethodEthCall, methodId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
