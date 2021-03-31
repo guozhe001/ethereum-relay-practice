@@ -17,3 +17,6 @@
 # vendor/
 
 ./idea
+
+./keystore
+./**/keystore

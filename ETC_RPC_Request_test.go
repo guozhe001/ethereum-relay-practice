@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/guozhe001/ethereum-relay-practice/constant"
 	"github.com/guozhe001/ethereum-relay-practice/model"
@@ -10,7 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"log"
 	"math"
-	"math/big"
 	"strings"
 	"testing"
 )
@@ -148,9 +148,18 @@ func invokeGetBlockByNumber(t *testing.T, haveTransaction bool) model.Block {
 }
 
 func TestETHRPCRequest_InvokeERC20Transfer(t *testing.T) {
+	transferMethodId, _ := util.GetMethodIdByFile("abi/GZToken_metadata.json", "transfer")
 	request := NewETCRPCRequest(constant.MyRopstenNetNodeUrl)
-	setString, b := new(big.Int).SetString("1", 10)
-	assert.True(t, b)
-	err := request.InvokeERC20Transfer("hello", *setString)
+	price, _ := request.GetGasPrice()
+	log.Print("price=", price)
+	var success string
+	data := model.EthCallRequest{
+		To:       common.HexToAddress("0xB8DfEe0D9aC703E75EE3D031148227B3BbB26524"),
+		Gas:      "0xde0b000",
+		GasPrice: price,
+		Data:     transferMethodId + common.HexToHash("0x15f94602F738f280d9A471B8fc34eDadeF6DD890").String()[2:] + common.HexToHash("0x2710").String()[2:],
+	}
+	err := request.EthCall(&success, data)
 	assert.NoError(t, err)
+	log.Print(success)
 }

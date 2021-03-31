@@ -7,7 +7,6 @@ import (
 	"github.com/guozhe001/ethereum-relay-practice/constant"
 	"github.com/guozhe001/ethereum-relay-practice/model"
 	"github.com/guozhe001/ethereum-relay-practice/util"
-	"log"
 	"math/big"
 )
 
@@ -63,8 +62,6 @@ func (e *ETHRPCRequest) GetBalances(addresses []string) ([]*string, error) {
 func (e *ETHRPCRequest) GetGasPrice() (string, error) {
 	var gasPrice string
 	err := e.client.client.Call(&gasPrice, constant.MethodGasPrice)
-	decode, _ := hexutil.Decode(gasPrice)
-	log.Printf("now gas price is %s\n", decode)
 	return gasPrice, err
 }
 
@@ -137,16 +134,7 @@ func (e *ETHRPCRequest) GetBlockByHash(hash string, haveTransaction bool) (model
 	return block, err
 }
 
-// InvokeERC20Transfer 调用ERC20的transfer方法
-func (e *ETHRPCRequest) InvokeERC20Transfer(to string, value big.Int) error {
-	var success bool
-	methodId, err := util.GetMethodId("./abi/GZToken_metadata.json", "transfer")
-	if err != nil {
-		return err
-	}
-	err = e.client.client.Call(&success, constant.MethodEthCall, methodId)
-	if err != nil {
-		return err
-	}
-	return nil
+// EthCall 调用eth_call
+func (e *ETHRPCRequest) EthCall(result interface{}, request model.EthCallRequest) error {
+	return e.client.client.Call(&result, constant.MethodEthCall, request, constant.TagLatest)
 }
