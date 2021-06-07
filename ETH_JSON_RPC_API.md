@@ -1,7 +1,5 @@
 # 以太坊JSON RPC API
 
-
-
 ### eth_getBlockByNumber
 Returns information about a block by block number.
 
@@ -162,4 +160,14 @@ $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getBlockByHash","params": 
 }
 ```
 
+
+### eth_sendRawTransaction
+Creates new message call transaction or a contract creation for signed transactions.
+
+Parameters
+DATA, The signed transaction data.
+
+```shell
+curl -X POST --data '{"jsonrpc":"2.0","method":"eth_sendRawTransaction","params":["0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"],"id":1}' https://mainnet.infura.io/v3/94bc20a138044cd7974fcd20b91d68ba |jq
+```
 

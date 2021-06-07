@@ -7,7 +7,7 @@ import (
 )
 
 func TestCreateWallet(t *testing.T) {
-	wallet, err := CreateWallet("")
+	wallet, err := CreateWallet("this_is_for_test")
 	assert.NoError(t, err)
 	log.Println(wallet)
 }

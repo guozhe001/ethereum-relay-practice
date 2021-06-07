@@ -49,15 +49,15 @@ func TestGetBalance(t *testing.T) {
 	log.Println(balance, "wei")
 }
 
-func TestGetERC20BalanceLocal(t *testing.T) {
-	request := NewETCRPCRequest(constant.MyLocalNetNodeUrl)
-	balanceRequest := model.ERC20BalanceRequest{
-		ContractAddress: "0x8D77117F45044A57b0564C5E3AF1d45F7442E581",
-		UserAddress:     "0xc0F680767D4Ae17C7adaF8C6d0b4805Bc207805e",
-		ContractDecimal: 21,
-	}
-	invokeGetERC20Balance(t, request, []model.ERC20BalanceRequest{balanceRequest})
-}
+//func TestGetERC20BalanceLocal(t *testing.T) {
+//  request := NewETCRPCRequest(constant.MyLocalNetNodeUrl)
+//  balanceRequest := model.ERC20BalanceRequest{
+//    ContractAddress: "0x8D77117F45044A57b0564C5E3AF1d45F7442E581",
+//    UserAddress:     "0xc0F680767D4Ae17C7adaF8C6d0b4805Bc207805e",
+//    ContractDecimal: 21,
+//  }
+//  invokeGetERC20Balance(t, request, []model.ERC20BalanceRequest{balanceRequest})
+//}
 
 func TestGetERC20BalanceRosten(t *testing.T) {
 	balanceRequest := model.ERC20BalanceRequest{
@@ -160,6 +160,16 @@ func TestETHRPCRequest_InvokeERC20Transfer(t *testing.T) {
 		Data:     transferMethodId + common.HexToHash("0x15f94602F738f280d9A471B8fc34eDadeF6DD890").String()[2:] + common.HexToHash("0x2710").String()[2:],
 	}
 	err := request.EthCall(&success, data)
+	if err != nil {
+		log.Print(err)
+	}
 	assert.NoError(t, err)
 	log.Print(success)
+}
+
+func TestGetNonce(t *testing.T) {
+	request := NewETCRPCRequest(constant.MyRopstenNetNodeUrl)
+	nonce, err := request.GetNonce("0x2560be5793F9AA00963e163A1287807Feb897e2F")
+	assert.NoError(t, err)
+	log.Print("nonce=", nonce)
 }

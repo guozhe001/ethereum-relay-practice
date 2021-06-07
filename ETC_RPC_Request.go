@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/rpc"
@@ -31,8 +32,8 @@ func (e *ETHRPCRequest) GetTransactionByHash(hash string) (model.Transaction, er
 
 // GetTransactions 批量查询交易
 func (e *ETHRPCRequest) GetTransactions(transactionHash []string) ([]*model.Transaction, error) {
-	result := []*model.Transaction{}
-	request := []rpc.BatchElem{}
+	var result []*model.Transaction
+	var request []rpc.BatchElem
 	for _, hash := range transactionHash {
 		transaction := model.Transaction{}
 		request = append(request, rpc.BatchElem{Method: constant.MethodGetTransactionByHash, Args: []interface{}{hash}, Result: &transaction})
@@ -68,8 +69,8 @@ func (e *ETHRPCRequest) GetGasPrice() (string, error) {
 // GetERC20Balances 获取满足ERC20定义的合约的余额，使用eth_call方式查询
 func (e *ETHRPCRequest) GetERC20Balances(params []model.ERC20BalanceRequest) ([]model.ERC20BalanceResponse, error) {
 	methodId := "0x70a08231"
-	batchElems := []rpc.BatchElem{}
-	result := []model.ERC20BalanceResponse{}
+	var batchElems []rpc.BatchElem
+	var result []model.ERC20BalanceResponse
 	gasPrice, err := e.GetGasPrice()
 	if err != nil {
 		return nil, err
@@ -137,4 +138,26 @@ func (e *ETHRPCRequest) GetBlockByHash(hash string, haveTransaction bool) (model
 // EthCall 调用eth_call
 func (e *ETHRPCRequest) EthCall(result interface{}, request model.EthCallRequest) error {
 	return e.client.client.Call(&result, constant.MethodEthCall, request, constant.TagLatest)
+}
+
+// EthSendRawTransaction 调用eth_sendRawTransaction方法
+// Creates new message call transaction or a contract creation for signed transactions.
+func (e *ETHRPCRequest) EthSendRawTransaction(data string) (txHash string, err error) {
+	if err = e.client.client.Call(&txHash, constant.MethodEthSendRawTransaction, data); err != nil {
+		return txHash, err
+	}
+	return txHash, nil
+}
+
+// GetNonce 获取地址的 nonce 值
+func (e *ETHRPCRequest) GetNonce(address string) (uint64, error) {
+	methodName := "eth_getTransactionCount"
+	nonce := ""
+	// 因为我们要查询最新的，根据基于 etTransactionCount 情况下的区块号关系，选取 pending
+	err := e.client.client.Call(&nonce, methodName, address, "pending")
+	if err != nil {
+		return 0, fmt.Errorf("发送交易失败! %s", err.Error())
+	}
+	n, _ := new(big.Int).SetString(nonce[2:], 16) // 采用大数类型将 16 进制的结果转为 10 进制
+	return n.Uint64(), nil                        // 返回交易 hash
 }

@@ -18,5 +18,7 @@
 
 ./idea
 
-./keystore
-./**/keystore
+keystores
+
+vendor
+/wallet/.keystores/*
