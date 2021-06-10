@@ -173,3 +173,32 @@ func TestGetNonce(t *testing.T) {
 	assert.NoError(t, err)
 	log.Print("nonce=", nonce)
 }
+
+func TestBscGetTransactionByHash(t *testing.T) {
+	request := NewETCRPCRequest(constant.MyBscMainNetUrl)
+	transaction, err := request.GetTransactionByHash("0x44558267d0794d978b72fc7e6a64ef68c1c8b2b4d7bbc2ac62c1907645d3929d")
+	assert.NoError(t, err)
+	assert.Equal(t, "0xdb4337fed84a47cf109b69884310d32c53eb3ff14d9268e54d3e10058062de5b", transaction.BlockHash)
+	log.Printf("%#v", transaction)
+}
+
+func TestETHRPCRequest_InvokeSoloTop(t *testing.T) {
+	transferMethodId, _ := util.GetMethodIdByFile("abi/BSC_busd.json", "balanceOf")
+	request := NewETCRPCRequest(constant.MyBscMainNetUrl)
+	price, _ := request.GetGasPrice()
+	log.Print("price=", price)
+	var success string
+	data := model.EthCallRequest{
+		To:       common.HexToAddress(constant.ContractERC20BUSD),
+		Gas:      "0xde0b000",
+		GasPrice: price,
+		Data:     transferMethodId + common.HexToHash("0x15f94602F738f280d9A471B8fc34eDadeF6DD890").String()[2:],
+	}
+
+	err := request.EthCall(&success, data)
+	if err != nil {
+		log.Print(err)
+	}
+	assert.NoError(t, err)
+	log.Print(success)
+}

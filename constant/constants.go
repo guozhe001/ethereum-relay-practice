@@ -5,6 +5,7 @@ const (
 	MyMainNetNodeUrl    string = "https://mainnet.infura.io/v3/94bc20a138044cd7974fcd20b91d68ba"
 	MyLocalNetNodeUrl          = "http://localhost:8545"
 	MyRopstenNetNodeUrl        = "https://ropsten.infura.io/v3/94bc20a138044cd7974fcd20b91d68ba"
+	MyBscMainNetUrl            = "https://apis.ankr.com/40d05760bba540ab95cb87bc5b449ab8/602045ef2a200f867afc105676fe0511/binance/full/main"
 )
 
 // 一些api方法
@@ -31,3 +32,7 @@ const ZeroOf64 = "00000000000000000000000000000000000000000000000000000000000000
 
 // HexPrefix 十六进制字符串前缀
 const HexPrefix = "0x"
+
+const (
+	ContractERC20BUSD = "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"
+)

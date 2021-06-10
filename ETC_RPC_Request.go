@@ -12,11 +12,12 @@ import (
 )
 
 type ETHRPCRequest struct {
-	client *ETHRPCClient
+	nonceManager *NonceManager // nonce 管理者实例
+	client       *ETHRPCClient
 }
 
 func NewETCRPCRequest(nodeUrl string) *ETHRPCRequest {
-	return &ETHRPCRequest{client: NewETHRPCClient(nodeUrl)}
+	return &ETHRPCRequest{nonceManager: NewNonceManager(), client: NewETHRPCClient(nodeUrl)}
 }
 
 // GetTransactionByHash 根据hash获取交易
@@ -161,3 +162,63 @@ func (e *ETHRPCRequest) GetNonce(address string) (uint64, error) {
 	n, _ := new(big.Int).SetString(nonce[2:], 16) // 采用大数类型将 16 进制的结果转为 10 进制
 	return n.Uint64(), nil                        // 返回交易 hash
 }
+
+//
+//// 发送 ERC20 代币交易，或称转账 ERC20 代币
+//// 参数分别是：
+//// 	   交易发起地址，代币合约地址，交易接收地址，代币数量，油费设置，代币的 decimal 值
+//func (e *ETHRPCRequest) invokeSoloTop(fromStr, contact, valueStr, methodId string, gasLimit, gasPrice uint64, decimal int) (string, error) {
+//
+//  to := common.HexToAddress(contact) // 将合约 contact 字符串类型的转为 address 类型的
+//  gasPrice_ := new(big.Int).SetUint64(gasPrice)
+//
+//  // 结构体中的 value 字段为 0
+//  amount := new(big.Int).SetInt64(0)
+//
+//  // 获取 nonce
+//  if nonce := e.nonceManager.GetNonce(fromStr); nonce == nil {
+//    // nonce 不存在，开始访问节点获取
+//    n, err := e.GetNonce(fromStr)
+//    if err != nil {
+//      return "", fmt.Errorf("获取 nonce 失败 %s", err.Error())
+//    }
+//    nonce = new(big.Int).SetUint64(n)
+//  }
+//
+//  // 构建 data，真实的 value 转账数值由 data 携带
+//  data := BuildERC20TransferData(methodId, valueStr, receiver, decimal)
+//  dataBytes := []byte(data)
+//
+//  // 构建交易结构体
+//  transaction := types.NewTransaction(
+//    nonce.Uint64(),
+//    to,
+//    amount,
+//    gasLimit,
+//    gasPrice_,
+//    dataBytes)
+//
+//  return e.SendTransaction(fromStr, transaction)
+//}
+//
+//// 发送交易，根据入参 transaction 的不同变量设置，达到发送不同种类的交易
+//func (e *ETHRPCRequest) SendTransaction(address string, transaction *types.Transaction) (string, error) {
+//  // 签名交易数据
+//  signTx, err := SignETHTransaction(address, transaction)
+//  if err != nil {
+//    return "", fmt.Errorf("签名失败! %s", err.Error())
+//  }
+//  // rlp 序列化
+//  txRlpData, err := rlp.EncodeToBytes(signTx)
+//  if nil != err {
+//    return "", fmt.Errorf("rlp 序列化失败! %s", err.Error())
+//  }
+//  // 下面调用以太坊的 rpc 接口
+//  txHash := ""
+//  methodName := "eth_sendRawTransaction"
+//  err = e.client.client.Call(&txHash, methodName, common.ToHex(txRlpData))
+//  if err != nil {
+//    return "", fmt.Errorf("发送交易失败! %s", err.Error())
+//  }
+//  return txHash, nil // 返回交易 hash
+//}
