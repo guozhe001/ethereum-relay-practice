@@ -20,5 +20,5 @@
 
 keystores
 
-vendor
 /wallet/.keystores/*
+/vendor/*
